@@ -1,0 +1,71 @@
+(* Nyx grammar, EBNF. Matches src/compiler/compiler.c exactly -- the parser
+   is a hand-written recursive-descent + Pratt parser, not generated from
+   this file, so if you change one you must change the other. *)
+
+program        = declaration* EOF ;
+
+declaration    = funDecl
+               | varDecl
+               | statement ;
+
+funDecl        = "fun" IDENTIFIER "(" parameters? ")" block ;
+parameters     = IDENTIFIER ( "," IDENTIFIER )* ;
+
+varDecl        = "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement      = exprStmt
+               | ifStmt
+               | whileStmt
+               | forStmt
+               | returnStmt
+               | breakStmt
+               | continueStmt
+               | block ;
+
+exprStmt       = expression ";" ;
+
+ifStmt         = "if" "(" expression ")" statement ( "else" statement )? ;
+
+whileStmt      = "while" "(" expression ")" statement ;
+
+forStmt        = "for" "(" ( varDecl | exprStmt | ";" )
+                        expression? ";"
+                        expression? ")" statement ;
+
+returnStmt     = "return" expression? ";" ;
+breakStmt      = "break" ";" ;
+continueStmt   = "continue" ";" ;
+
+block          = "{" declaration* "}" ;
+
+(* Expression grammar, precedence low to high -- this ladder is what
+   parsePrecedence()/the `rules[]` table in compiler.c implements as a
+   single loop instead of one function per level. *)
+expression     = assignment ;
+assignment     = ( call "[" expression "]" | IDENTIFIER ) "=" assignment
+               | logic_or ;
+logic_or       = logic_and ( "or" logic_and )* ;
+logic_and      = equality ( "and" equality )* ;
+equality       = comparison ( ( "==" | "!=" ) comparison )* ;
+comparison     = term ( ( "<" | "<=" | ">" | ">=" ) term )* ;
+term           = factor ( ( "+" | "-" ) factor )* ;
+factor         = unary ( ( "*" | "/" | "%" ) unary )* ;
+unary          = ( "!" | "-" ) unary | call ;
+call           = primary ( "(" arguments? ")" | "[" expression "]" )* ;
+arguments      = expression ( "," expression )* ;
+
+primary        = NUMBER | STRING | "true" | "false" | "nil"
+               | IDENTIFIER
+               | "(" expression ")"
+               | arrayLiteral
+               | mapLiteral ;
+
+arrayLiteral   = "[" ( expression ( "," expression )* )? "]" ;
+mapLiteral     = "{" ( pair ( "," pair )* )? "}" ;
+pair           = expression ":" expression ;   (* key must evaluate to a string; see docs/architecture.md *)
+
+NUMBER         = DIGIT+ ( "." DIGIT+ )? ;
+STRING         = '"' ( <any char except '"'> | "\\" <escape> )* '"' ;
+IDENTIFIER     = ALPHA ( ALPHA | DIGIT )* ;
+ALPHA          = "a".."z" | "A".."Z" | "_" ;
+DIGIT          = "0".."9" ;
