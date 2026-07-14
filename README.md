@@ -49,11 +49,7 @@ source --scan--> tokens --compile (single pass)--> bytecode --run--> output
 
 Full writeup, including every non-obvious design decision and why it was
 made: **[docs/architecture.md](docs/architecture.md)**. Bytecode
-instruction reference: **[docs/bytecode.md](docs/bytecode.md)**. If you're
-trying to understand the code well enough to discuss it in detail (an
-interview, a code review, whatever), start with
-**[docs/study-guide.md](docs/study-guide.md)** -- it's written as a
-module-by-module explainer with likely questions and model answers.
+instruction reference: **[docs/bytecode.md](docs/bytecode.md)**.
 
 ### Design decisions at a glance
 
@@ -88,9 +84,7 @@ old string) instead of allocating a new string every iteration, turning an
 apparently-O(n²) loop into amortized O(n) in practice. Nyx has no
 equivalent optimization (no mutable string-builder type at all yet -- see
 `docs/roadmap.md`), so it pays the full O(n²) cost every time. A
-believable benchmark table has losses in it; see
-[docs/study-guide.md](docs/study-guide.md#5-a-few-numbers-worth-having-ready)
-for how to talk about this one specifically.
+believable benchmark table has losses in it.
 
 ## Building
 

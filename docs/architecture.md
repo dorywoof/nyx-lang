@@ -65,9 +65,7 @@ correctly -- there's no register allocator, no register-pressure
 bookkeeping, and expression compilation is a direct, obvious translation of
 the Pratt parser's recursion. That simplicity is worth more here than the
 (real, measurable) performance register-based bytecode would buy, given
-that program correctness and explainability were the actual goals. See
-`docs/study-guide.md` for how to answer "wouldn't a register VM be faster?"
-in an interview.
+that program correctness and explainability were the actual goals.
 
 ## Why mark-sweep GC, not reference counting
 
