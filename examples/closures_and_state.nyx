@@ -1,0 +1,27 @@
+/* A closure-based "object": makeAccount returns two closures that share a
+ * private `balance` upvalue nothing outside this function can touch. */
+fun makeAccount(startingBalance) {
+    var balance = startingBalance;
+
+    fun deposit(amount) {
+        balance = balance + amount;
+        return balance;
+    }
+
+    fun withdraw(amount) {
+        if (amount > balance) {
+            print("insufficient funds");
+            return balance;
+        }
+        balance = balance - amount;
+        return balance;
+    }
+
+    var account = {"deposit": deposit, "withdraw": withdraw};
+    return account;
+}
+
+var acc = makeAccount(100);
+print(acc["deposit"](50));   // 150
+print(acc["withdraw"](30));  // 120
+print(acc["withdraw"](1000)); // insufficient funds -> 120
