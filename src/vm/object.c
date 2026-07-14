@@ -23,8 +23,6 @@ static Obj *allocateObject(size_t size, ObjType type) {
 }
 
 static uint32_t hashString(const char *key, int length) {
-    /* FNV-1a. Not cryptographic, not meant to be -- just fast and
-     * well-distributed enough for an identifier/string table. */
     uint32_t hash = 2166136261u;
     for (int i = 0; i < length; i++) {
         hash ^= (uint8_t)key[i];
@@ -39,7 +37,7 @@ static ObjString *allocateString(char *chars, int length, uint32_t hash) {
     string->chars = chars;
     string->hash = hash;
 
-    push(OBJ_VAL(string)); /* keep it alive while tableSet may allocate/GC */
+    push(OBJ_VAL(string));
     tableSet(&vm.strings, string, NIL_VAL);
     pop();
 

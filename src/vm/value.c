@@ -36,13 +36,9 @@ bool valuesEqual(Value a, Value b) {
         case VAL_NUMBER:
             return AS_NUMBER(a) == AS_NUMBER(b);
         case VAL_OBJ:
-            /* Strings are interned (see vm.c's string table), so pointer
-             * equality is content equality for OBJ_STRING; for every other
-             * object type Nyx has reference semantics, which is also what
-             * pointer equality gives us for free. */
             return AS_OBJ(a) == AS_OBJ(b);
     }
-    return false; /* unreachable */
+    return false;
 }
 
 void printValue(Value value) {

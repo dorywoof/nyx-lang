@@ -5,12 +5,6 @@
 #include "nyx/opcodes.h"
 #include "nyx/value.h"
 
-/*
- * A Chunk is one function body compiled to bytecode: a flat byte array plus
- * a parallel line-number array (same index, so code[i] was emitted from
- * source line lines[i]) and a constant pool for literals too big to fit in
- * an opcode's operand byte.
- */
 typedef struct {
     int count;
     int capacity;

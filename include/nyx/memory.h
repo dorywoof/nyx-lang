@@ -18,10 +18,6 @@
 #define FREE_ARRAY(type, pointer, oldCount) \
     reallocate(pointer, sizeof(type) * (size_t)(oldCount), 0)
 
-/* Every allocation, growth, shrink and free in the whole interpreter routes
- * through here. That single choke point is what makes the GC possible: it
- * tracks bytesAllocated and, when growing, gives the collector a chance to
- * run before handing out more memory. See docs/architecture.md. */
 void *reallocate(void *pointer, size_t oldSize, size_t newSize);
 
 void markObject(Obj *object);

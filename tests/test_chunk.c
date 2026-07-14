@@ -10,7 +10,7 @@ void run_chunk_tests(void) {
     TEST_CHECK_EQ_INT(chunk.count, 0);
 
     for (int i = 0; i < 20; i++) {
-        writeChunk(&chunk, (uint8_t)i, i /* fake line number */);
+        writeChunk(&chunk, (uint8_t)i, i);
     }
     TEST_CHECK_EQ_INT(chunk.count, 20);
     TEST_CHECK(chunk.capacity >= 20);

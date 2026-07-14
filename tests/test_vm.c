@@ -19,10 +19,6 @@
 #include "nyx/vm.h"
 #include "test_harness.h"
 
-/* Redirects the process's stdout fd to an unnamed temp file for the
- * duration of `interpret(src)`, then restores it and returns whatever was
- * printed. This is a genuine end-to-end test: it exercises the scanner,
- * compiler and VM together exactly the way running a .nyx script does. */
 static char *runCapture(const char *src) {
     fflush(stdout);
     int savedFd = nyx_dup(nyx_fileno(stdout));
@@ -81,7 +77,7 @@ void run_vm_tests(void) {
     expectOutput("break-continue",
                  "var sum = 0; for (var i = 0; i < 10; i = i + 1) { "
                  "if (i == 5) { break; } if (i % 2 == 0) { continue; } sum = sum + i; } print(sum);",
-                 "4\n"); /* 1 + 3 = 4 (evens skipped, loop breaks before 5) */
+                 "4\n");
 
     expectOutput("function-recursion",
                  "fun fib(n) { if (n < 2) { return n; } return fib(n - 1) + fib(n - 2); } "

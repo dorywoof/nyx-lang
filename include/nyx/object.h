@@ -16,9 +16,6 @@ typedef enum {
     OBJ_MAP,
 } ObjType;
 
-/* Every heap object starts with this header so the GC can walk the
- * VM-owned linked list of all objects (vm.objects) without knowing the
- * concrete type -- see gc.c sweep(). */
 struct Obj {
     ObjType type;
     bool isMarked;
@@ -29,7 +26,7 @@ struct ObjString {
     Obj obj;
     int length;
     char *chars;
-    uint32_t hash; /* cached: computed once at creation, used on every table op */
+    uint32_t hash;
 };
 
 typedef struct {
@@ -37,12 +34,12 @@ typedef struct {
     int arity;
     int upvalueCount;
     Chunk chunk;
-    ObjString *name; /* NULL for the implicit top-level script function */
+    ObjString *name;
 } ObjFunction;
 
 typedef struct {
     bool isError;
-    Value value; /* result value, or an error-message string when isError */
+    Value value;
 } NativeResult;
 
 typedef NativeResult (*NativeFn)(int argCount, Value *args);
@@ -50,15 +47,15 @@ typedef NativeResult (*NativeFn)(int argCount, Value *args);
 typedef struct {
     Obj obj;
     NativeFn function;
-    int arity; /* -1 means variadic */
+    int arity;
     ObjString *name;
 } ObjNative;
 
 typedef struct ObjUpvalue {
     Obj obj;
-    Value *location;      /* while open: points into a live VM stack slot */
-    Value closed;          /* while closed: holds the value itself */
-    struct ObjUpvalue *next; /* VM's sorted open-upvalue list */
+    Value *location;
+    Value closed;
+    struct ObjUpvalue *next;
 } ObjUpvalue;
 
 typedef struct {
@@ -75,7 +72,7 @@ typedef struct {
 
 typedef struct {
     Obj obj;
-    Table table; /* Nyx maps are string-keyed only -- see docs/architecture.md */
+    Table table;
 } ObjMap;
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)

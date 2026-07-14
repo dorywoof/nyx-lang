@@ -4,8 +4,8 @@
 #include "nyx/scanner.h"
 
 typedef struct {
-    const char *start;   /* first char of the token being scanned */
-    const char *current; /* char about to be consumed */
+    const char *start;
+    const char *current;
     int line;
 } Scanner;
 
@@ -114,9 +114,6 @@ static TokenType checkKeyword(int start, int length, const char *rest, TokenType
     return TOKEN_IDENTIFIER;
 }
 
-/* Hand-rolled trie via switch-on-first-char, same shape as clox's -- a real
- * hash map would be overkill for ~14 keywords and would hide the trie
- * structure the compiler generates for something this small anyway. */
 static TokenType identifierType(void) {
     switch (scanner.start[0]) {
         case 'a': return checkKeyword(1, 2, "nd", TOKEN_AND);
@@ -158,9 +155,6 @@ static Token number(void) {
 }
 
 static Token string(void) {
-    /* Escapes are resolved later by the compiler when it copies the token
-     * text into an ObjString (see compiler.c's `string()` parse rule) --
-     * the scanner's only job here is finding the matching close quote. */
     while (peek() != '"' && !isAtEnd()) {
         if (peek() == '\n') scanner.line++;
         if (peek() == '\\' && peekNext() != '\0') advance();
@@ -169,7 +163,7 @@ static Token string(void) {
 
     if (isAtEnd()) return errorToken("Unterminated string.");
 
-    advance(); /* closing quote */
+    advance();
     return makeToken(TOKEN_STRING);
 }
 

@@ -9,9 +9,6 @@
 #include "nyx/object.h"
 #include "nyx/vm.h"
 
-/* Every native returns a NativeResult instead of throwing through a global
- * VM pointer -- it keeps the C<->Nyx boundary explicit (see
- * docs/study-guide.md "why NativeResult and not a VM-wide error flag"). */
 static NativeResult ok(Value value) { return (NativeResult){false, value}; }
 
 static NativeResult nativeErrorf(const char *format, ...) {

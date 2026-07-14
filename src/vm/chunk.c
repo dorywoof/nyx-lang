@@ -30,9 +30,6 @@ void writeChunk(Chunk *chunk, uint8_t byte, int line) {
 }
 
 int addConstant(Chunk *chunk, Value value) {
-    /* Pushed/popped around writeValueArray purely so the constant itself is
-     * a GC root while the array grows -- growth can allocate and trigger a
-     * collection, and this value isn't reachable from anywhere else yet. */
     push(value);
     writeValueArray(&chunk->constants, value);
     pop();

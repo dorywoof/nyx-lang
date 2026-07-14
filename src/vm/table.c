@@ -17,9 +17,6 @@ void freeTable(Table *table) {
     initTable(table);
 }
 
-/* Linear probing with tombstones. A tombstone is a slot with key == NULL
- * but value == BOOL_VAL(true); it keeps probe chains intact after a delete
- * without needing to shift or rehash. */
 static Entry *findEntry(Entry *entries, int capacity, ObjString *key) {
     uint32_t index = key->hash % (uint32_t)capacity;
     Entry *tombstone = NULL;
@@ -93,7 +90,7 @@ bool tableDelete(Table *table, ObjString *key) {
     if (entry->key == NULL) return false;
 
     entry->key = NULL;
-    entry->value = BOOL_VAL(true); /* tombstone marker */
+    entry->value = BOOL_VAL(true);
     return true;
 }
 

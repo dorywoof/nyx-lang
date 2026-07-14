@@ -143,10 +143,6 @@ static bool callValue(Value callee, int argCount) {
     return false;
 }
 
-/* Upvalues that point at the same stack slot must be the same ObjUpvalue
- * (otherwise two closures over the same local would drift out of sync the
- * moment one of them wrote to it) -- so open upvalues live in a linked
- * list, sorted by stack depth, and this walks it to find-or-create. */
 static ObjUpvalue *captureUpvalue(Value *local) {
     ObjUpvalue *prevUpvalue = NULL;
     ObjUpvalue *upvalue = vm.openUpvalues;
@@ -485,7 +481,7 @@ static InterpretResult run(void) {
             case OP_ARRAY: {
                 uint8_t count = READ_BYTE();
                 ObjArray *array = newArray();
-                push(OBJ_VAL(array)); /* GC root while we fill it */
+                push(OBJ_VAL(array));
                 for (int i = count; i >= 1; i--) {
                     writeValueArray(&array->items, vm.stackTop[-1 - i]);
                 }

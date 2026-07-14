@@ -15,20 +15,20 @@ typedef struct {
     Token current;
     Token previous;
     bool hadError;
-    bool panicMode; /* suppresses cascading error spam after the first one */
+    bool panicMode;
 } Parser;
 
 typedef enum {
     PREC_NONE,
-    PREC_ASSIGNMENT, /* = */
-    PREC_OR,         /* or */
-    PREC_AND,        /* and */
-    PREC_EQUALITY,   /* == != */
-    PREC_COMPARISON, /* < > <= >= */
-    PREC_TERM,       /* + - */
-    PREC_FACTOR,     /* * / % */
-    PREC_UNARY,      /* ! - */
-    PREC_CALL,       /* . () [] */
+    PREC_ASSIGNMENT,
+    PREC_OR,
+    PREC_AND,
+    PREC_EQUALITY,
+    PREC_COMPARISON,
+    PREC_TERM,
+    PREC_FACTOR,
+    PREC_UNARY,
+    PREC_CALL,
     PREC_PRIMARY
 } Precedence;
 
@@ -42,8 +42,8 @@ typedef struct {
 
 typedef struct {
     Token name;
-    int depth;      /* -1 while being initialized (its own initializer is out of scope) */
-    bool isCaptured; /* true once some nested function closes over this local */
+    int depth;
+    bool isCaptured;
 } Local;
 
 typedef struct {
@@ -56,11 +56,6 @@ typedef enum {
     TYPE_SCRIPT,
 } FunctionType;
 
-/* Tracks the innermost enclosing loop so break/continue know where to jump.
- * `continueTarget` is the bytecode offset a `continue` should loop back to
- * (the increment clause for `for`, the condition re-check for `while`);
- * `breakJumps` collects OP_JUMP offsets that all get patched to "just past
- * the loop" once the loop's end is known. */
 typedef struct LoopState {
     struct LoopState *enclosing;
     int continueTarget;
@@ -94,7 +89,6 @@ static void errorAt(Token *token, const char *message) {
     if (token->type == TOKEN_EOF) {
         fprintf(stderr, " at end");
     } else if (token->type == TOKEN_ERROR) {
-        /* message already describes the problem */
     } else {
         fprintf(stderr, " at '%.*s'", token->length, token->start);
     }
@@ -188,9 +182,6 @@ static void initCompiler(Compiler *compiler, FunctionType type) {
         current->function->name = copyString(parser.previous.start, parser.previous.length);
     }
 
-    /* Slot 0 of every call frame is reserved for the closure being called;
-     * giving it an empty name keeps it out of reach of user code that
-     * tries to resolve a local by name. */
     Local *local = &current->locals[current->localCount++];
     local->depth = 0;
     local->isCaptured = false;
@@ -266,11 +257,6 @@ static int addUpvalue(Compiler *compiler, uint8_t index, bool isLocal) {
     return compiler->function->upvalueCount++;
 }
 
-/* Walks the compiler chain outward looking for `name` as a local in some
- * enclosing function. Each hop between functions adds one upvalue "link" so
- * that a variable three functions away is captured by every function in
- * between too -- that's what makes deeply nested closures work without the
- * VM needing to know about "grandparent" frames at runtime. */
 static int resolveUpvalue(Compiler *compiler, Token *name) {
     if (compiler->enclosing == NULL) return -1;
 
@@ -317,7 +303,7 @@ static uint8_t parseVariable(const char *errorMessage) {
     consume(TOKEN_IDENTIFIER, errorMessage);
 
     declareVariable();
-    if (current->scopeDepth > 0) return 0; /* locals aren't looked up by name at runtime */
+    if (current->scopeDepth > 0) return 0;
 
     return identifierConstant(&parser.previous);
 }
@@ -386,7 +372,7 @@ static void binary(bool canAssign) {
         case TOKEN_STAR: emitByte(OP_MULTIPLY); break;
         case TOKEN_SLASH: emitByte(OP_DIVIDE); break;
         case TOKEN_PERCENT: emitByte(OP_MODULO); break;
-        default: return; /* unreachable */
+        default: return;
     }
 }
 
@@ -414,7 +400,7 @@ static void literal(bool canAssign) {
         case TOKEN_FALSE: emitByte(OP_FALSE); break;
         case TOKEN_NIL: emitByte(OP_NIL); break;
         case TOKEN_TRUE: emitByte(OP_TRUE); break;
-        default: return; /* unreachable */
+        default: return;
     }
 }
 
@@ -430,9 +416,6 @@ static void number(bool canAssign) {
     emitConstant(NUMBER_VAL(value));
 }
 
-/* Resolves \n \t \r \\ \" \0 ; anything else passes the backslash through
- * unchanged rather than erroring, which keeps this simple for a language
- * whose users won't be writing regex-heavy string literals. */
 static ObjString *unescapeString(const char *raw, int rawLength) {
     char *buf = (char *)malloc((size_t)rawLength + 1);
     int len = 0;
@@ -507,9 +490,9 @@ static void mapLiteral(bool canAssign) {
     uint8_t count = 0;
     if (!check(TOKEN_RIGHT_BRACE)) {
         do {
-            expression(); /* key */
+            expression();
             consume(TOKEN_COLON, "Expect ':' after map key.");
-            expression(); /* value */
+            expression();
             if (count == 255) error("Can't have more than 255 pairs in a map literal.");
             count++;
         } while (matchToken(TOKEN_COMMA));
@@ -525,7 +508,7 @@ static void unary(bool canAssign) {
     switch (operatorType) {
         case TOKEN_BANG: emitByte(OP_NOT); break;
         case TOKEN_MINUS: emitByte(OP_NEGATE); break;
-        default: return; /* unreachable */
+        default: return;
     }
 }
 
@@ -574,16 +557,6 @@ ParseRule rules[] = {
     [TOKEN_EOF]           = {NULL, NULL, PREC_NONE},
 };
 
-/*
- * Pratt parsing in one paragraph: every token that can *start* an
- * expression has a `prefix` function; every token that can *continue* one
- * (a binary operator, a call, an index) has an `infix` function plus a
- * `precedence`. parsePrecedence(min) calls the prefix rule once, then keeps
- * consuming infix rules as long as the next token's precedence is >= min --
- * that single loop, driven entirely by the table above, is what implements
- * operator precedence and associativity without a separate grammar rule
- * per precedence level. See docs/study-guide.md for a walked example.
- */
 static void parsePrecedence(Precedence precedence) {
     advanceParser();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
@@ -728,7 +701,6 @@ static void forStatement(void) {
     consume(TOKEN_LEFT_PAREN, "Expect '(' after 'for'.");
 
     if (matchToken(TOKEN_SEMICOLON)) {
-        /* no initializer */
     } else if (matchToken(TOKEN_VAR)) {
         varDeclaration();
     } else {
@@ -738,7 +710,7 @@ static void forStatement(void) {
     LoopState loop;
     int loopStart = currentChunk()->count;
     beginLoop(&loop);
-    loop.continueTarget = loopStart; /* overwritten below once we know where the increment lives */
+    loop.continueTarget = loopStart;
 
     int exitJump = -1;
     if (!matchToken(TOKEN_SEMICOLON)) {
@@ -822,7 +794,7 @@ static void synchronize(void) {
             case TOKEN_WHILE:
             case TOKEN_RETURN:
                 return;
-            default:; /* keep skipping */
+            default:;
         }
         advanceParser();
     }

@@ -8,21 +8,6 @@
 
 #define GC_HEAP_GROW_FACTOR 2
 
-/*
- * Mark-sweep, tri-color, non-generational, non-incremental. It stops the
- * world (there's only one thread) whenever bytesAllocated crosses nextGC.
- *
- * Why mark-sweep and not reference counting? Refcounting is simpler to
- * reason about locally (every store/overwrite touches a counter) but it
- * cannot free cycles on its own -- and Nyx has cycles the moment a closure
- * captures a variable that (directly or through another closure) ends up
- * holding a reference back to itself, or a map/array holds itself. A
- * teaching VM that "mostly" collects memory is worse than one that always
- * does, so this trades a periodic pause for correctness with zero extra
- * bookkeeping per assignment. See docs/study-guide.md for the interview
- * version of this answer.
- */
-
 static void markRoots(void) {
     for (Value *slot = vm.stack; slot < vm.stackTop; slot++) {
         markValue(*slot);
@@ -46,9 +31,6 @@ static void markArray(ValueArray *array) {
     }
 }
 
-/* "Blacken" = an object has already been marked gray (reachable, not yet
- * scanned); this walks its own references and marks each of those gray too,
- * turning the object itself black (reachable, fully scanned). */
 static void blackenObject(Obj *object) {
 #ifdef NYX_LOG_GC
     fprintf(stderr, "gc: blacken %p (type %d)\n", (void *)object, object->type);
@@ -57,7 +39,7 @@ static void blackenObject(Obj *object) {
     switch (object->type) {
         case OBJ_STRING:
         case OBJ_NATIVE:
-            break; /* no outgoing references */
+            break;
 
         case OBJ_FUNCTION: {
             ObjFunction *function = (ObjFunction *)object;
@@ -146,7 +128,7 @@ static void sweep(void) {
     Obj *object = vm.objects;
     while (object != NULL) {
         if (object->isMarked) {
-            object->isMarked = false; /* reset for next cycle */
+            object->isMarked = false;
             previous = object;
             object = object->next;
         } else {
@@ -174,9 +156,6 @@ void markObject(Obj *object) {
 
     if (vm.grayCapacity < vm.grayCount + 1) {
         vm.grayCapacity = GROW_CAPACITY(vm.grayCapacity);
-        /* Deliberately NOT going through reallocate(): the gray stack is
-         * scratch space for the collector itself, so growing it must not
-         * recursively trigger another collection mid-collection. */
         vm.grayStack = (Obj **)realloc(vm.grayStack, sizeof(Obj *) * (size_t)vm.grayCapacity);
         if (vm.grayStack == NULL) {
             fprintf(stderr, "nyx: out of memory growing the GC gray stack\n");
@@ -197,9 +176,6 @@ void collectGarbage(void) {
 
     markRoots();
     traceReferences();
-    /* The intern table holds every live string, but it must not itself
-     * keep strings alive -- otherwise no string would ever be collected.
-     * So we sweep it of anything not marked by real references first. */
     tableRemoveWhiteKeys(&vm.strings);
     sweep();
 

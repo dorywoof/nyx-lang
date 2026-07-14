@@ -17,7 +17,7 @@ void run_scanner_tests(void) {
     TEST_CHECK_EQ_INT(nextTok().type, TOKEN_EQUAL);
     Token num = nextTok();
     TEST_CHECK_EQ_INT(num.type, TOKEN_NUMBER);
-    TEST_CHECK_EQ_INT(num.length, 4); /* "12.5" */
+    TEST_CHECK_EQ_INT(num.length, 4);
     TEST_CHECK_EQ_INT(nextTok().type, TOKEN_SEMICOLON);
     TEST_CHECK_EQ_INT(nextTok().type, TOKEN_EOF);
 

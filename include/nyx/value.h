@@ -6,16 +6,6 @@
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;
 
-/*
- * Nyx values are represented as a tagged union rather than NaN-boxing.
- * NaN-boxing packs every value into a single 64-bit double by hiding type
- * tags inside the unused bit patterns of NaN doubles -- it's faster (no
- * branch on type, half the memory) but unreadable without a diagram and a
- * lot of bit-twiddling commentary. A tagged union is what every mainstream
- * teaching VM (and plenty of production ones) uses because the size cost is
- * paid once per stack slot, not once per operation, and the code stays
- * something a reviewer can read top to bottom. See docs/architecture.md.
- */
 typedef enum {
     VAL_NIL,
     VAL_BOOL,
@@ -58,8 +48,6 @@ void freeValueArray(ValueArray *array);
 
 bool valuesEqual(Value a, Value b);
 void printValue(Value value);
-/* Writes a printable representation into buf (truncated to size). Used by
- * the str() native and by error messages that can't just fprintf. */
 void formatValue(char *buf, size_t size, Value value);
 
 #endif
