@@ -1,0 +1,7 @@
+var name = "World";
+print("Hello, " + name + "!");
+print(len("nyx"));
+print(slice("hello world", 0, 5));
+print(slice("hello world", 6));
+print(str(3.5) + "x");
+print(num("42") + 8);

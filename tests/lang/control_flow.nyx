@@ -1,0 +1,31 @@
+var sum = 0;
+for (var i = 1; i <= 20; i = i + 1) {
+    if (i % 3 == 0 and i % 5 == 0) {
+        continue;
+    }
+    if (i > 15) {
+        break;
+    }
+    sum = sum + i;
+}
+print(sum);
+
+var i = 0;
+while (i < 3) {
+    print("while " + str(i));
+    i = i + 1;
+}
+
+fun classify(n) {
+    if (n < 0) {
+        return "negative";
+    } else if (n == 0) {
+        return "zero";
+    } else {
+        return "positive";
+    }
+}
+
+print(classify(-5));
+print(classify(0));
+print(classify(5));

@@ -1,0 +1,20 @@
+var nums = [10, 20, 30];
+push(nums, 40);
+print(len(nums));
+print(nums[0]);
+print(nums[3]);
+print(pop(nums));
+print(len(nums));
+
+var user = {"name": "Ada", "age": 36};
+print(user["name"]);
+user["age"] = 37;
+print(user["age"]);
+print(has(user, "name"));
+print(has(user, "email"));
+
+var total = 0;
+for (var i = 0; i < len(nums); i = i + 1) {
+    total = total + nums[i];
+}
+print(total);
