@@ -1,0 +1,17 @@
+/*
+ * Naive O(n^2) concatenation on purpose: Nyx has no mutable string-builder
+ * type in its v1 stdlib (see docs/roadmap.md), so `s = s + "x"` allocates a
+ * brand new string every iteration, same as the naive version of this loop
+ * in most scripting languages. That makes this benchmark measure
+ * allocator + GC throughput under a heavy small-object churn pattern.
+ */
+var n = 20000;
+var t0 = clock();
+var s = "";
+for (var i = 0; i < n; i = i + 1) {
+    s = s + "x";
+}
+var elapsed = clock() - t0;
+
+print("LEN:" + str(len(s)));
+print("TIME:" + str(elapsed));

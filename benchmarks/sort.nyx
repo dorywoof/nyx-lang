@@ -1,0 +1,30 @@
+/*
+ * Bubble sort, deliberately -- an O(n^2) algorithm makes the interpreter's
+ * per-operation overhead (array indexing, comparisons, loop bookkeeping)
+ * the dominant cost, which is exactly what this benchmark is trying to
+ * measure. A well-chosen O(n log n) sort would mostly measure the
+ * algorithm, not the interpreter.
+ */
+var n = 2000;
+var a = [];
+var x = 1;
+for (var i = 0; i < n; i = i + 1) {
+    x = (x * 1103515245 + 12345) % 2147483648;
+    push(a, x % 100000);
+}
+
+var t0 = clock();
+for (var i = 0; i < n; i = i + 1) {
+    for (var j = 0; j < n - i - 1; j = j + 1) {
+        if (a[j] > a[j + 1]) {
+            var tmp = a[j];
+            a[j] = a[j + 1];
+            a[j + 1] = tmp;
+        }
+    }
+}
+var elapsed = clock() - t0;
+
+print("FIRST:" + str(a[0]));
+print("LAST:" + str(a[n - 1]));
+print("TIME:" + str(elapsed));

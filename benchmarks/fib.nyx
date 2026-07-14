@@ -1,0 +1,12 @@
+fun fib(n) {
+    if (n < 2) {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+var t0 = clock();
+var result = fib(32);
+var elapsed = clock() - t0;
+print("RESULT:" + str(result));
+print("TIME:" + str(elapsed));
