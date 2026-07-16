@@ -151,6 +151,87 @@ static NativeResult nativeSlice(int argCount, Value *args) {
     return ok(OBJ_VAL(copyString(s->chars + start, end - start)));
 }
 
+static NativeResult nativeFind(int argCount, Value *args) {
+    (void)argCount;
+    if (!IS_STRING(args[0]) || !IS_STRING(args[1])) {
+        return nativeErrorf("find() expects (string, string).");
+    }
+    ObjString *haystack = AS_STRING(args[0]);
+    ObjString *needle = AS_STRING(args[1]);
+    if (needle->length == 0) return ok(NUMBER_VAL(0));
+    for (int i = 0; i + needle->length <= haystack->length; i++) {
+        if (memcmp(haystack->chars + i, needle->chars, (size_t)needle->length) == 0) {
+            return ok(NUMBER_VAL(i));
+        }
+    }
+    return ok(NUMBER_VAL(-1));
+}
+
+static NativeResult nativeSplit(int argCount, Value *args) {
+    (void)argCount;
+    if (!IS_STRING(args[0]) || !IS_STRING(args[1])) {
+        return nativeErrorf("split() expects (string, separator).");
+    }
+    ObjString *s = AS_STRING(args[0]);
+    ObjString *sep = AS_STRING(args[1]);
+    if (sep->length == 0) return nativeErrorf("split() expects a non-empty separator.");
+    ObjArray *result = newArray();
+    push(OBJ_VAL(result));
+    int start = 0;
+    int i = 0;
+    while (i + sep->length <= s->length) {
+        if (memcmp(s->chars + i, sep->chars, (size_t)sep->length) == 0) {
+            ObjString *piece = copyString(s->chars + start, i - start);
+            push(OBJ_VAL(piece));
+            writeValueArray(&result->items, OBJ_VAL(piece));
+            pop();
+            i += sep->length;
+            start = i;
+        } else {
+            i++;
+        }
+    }
+    ObjString *tail = copyString(s->chars + start, s->length - start);
+    push(OBJ_VAL(tail));
+    writeValueArray(&result->items, OBJ_VAL(tail));
+    pop();
+    pop();
+    return ok(OBJ_VAL(result));
+}
+
+static NativeResult nativeJoin(int argCount, Value *args) {
+    (void)argCount;
+    if (!IS_ARRAY(args[0]) || !IS_STRING(args[1])) {
+        return nativeErrorf("join() expects (array, separator).");
+    }
+    ObjArray *array = AS_ARRAY(args[0]);
+    ObjString *sep = AS_STRING(args[1]);
+    size_t total = 0;
+    for (int i = 0; i < array->items.count; i++) {
+        if (!IS_STRING(array->items.values[i])) {
+            return nativeErrorf("join() expects an array of strings, got %s at index %d.",
+                                valueTypeName(array->items.values[i]), i);
+        }
+        total += (size_t)AS_STRING(array->items.values[i])->length;
+        if (i > 0) total += (size_t)sep->length;
+    }
+    char *buf = malloc(total + 1);
+    if (buf == NULL) return nativeErrorf("join() ran out of memory.");
+    size_t at = 0;
+    for (int i = 0; i < array->items.count; i++) {
+        if (i > 0) {
+            memcpy(buf + at, sep->chars, (size_t)sep->length);
+            at += (size_t)sep->length;
+        }
+        ObjString *item = AS_STRING(array->items.values[i]);
+        memcpy(buf + at, item->chars, (size_t)item->length);
+        at += (size_t)item->length;
+    }
+    ObjString *joined = copyString(buf, (int)total);
+    free(buf);
+    return ok(OBJ_VAL(joined));
+}
+
 void registerNatives(void) {
     defineNative("clock", nativeClock, 0);
     defineNative("print", nativePrint, -1);
@@ -164,4 +245,7 @@ void registerNatives(void) {
     defineNative("has", nativeHas, 2);
     defineNative("assert", nativeAssert, -1);
     defineNative("slice", nativeSlice, -1);
+    defineNative("find", nativeFind, 2);
+    defineNative("split", nativeSplit, 2);
+    defineNative("join", nativeJoin, 2);
 }

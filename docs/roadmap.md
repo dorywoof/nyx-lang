@@ -18,10 +18,10 @@ that deserved more thought than "just ship it."
   the VM unwinds on `throw`, or (simpler, slower) representing errors as
   values and threading them through explicitly first, then adding sugar.
 - **A real standard library surface.** Current natives (`print`, `len`,
-  `str`, `num`, `type`, `push`/`pop`, `keys`/`has`, `slice`, `assert`,
-  `clock`) cover what the test suite and benchmarks needed. Missing:
-  string splitting/joining/searching, math functions beyond arithmetic,
-  file I/O, and a real error-message-friendly `assert`.
+  `str`, `num`, `type`, `push`/`pop`, `keys`/`has`, `slice`,
+  `find`/`split`/`join`, `assert`, `clock`) cover what the test suite,
+  benchmarks and everyday string handling needed. Missing: math functions
+  beyond arithmetic, file I/O, and a real error-message-friendly `assert`.
 - **A module system (`import`).** Right now every `.nyx` file is the whole
   program. Multi-file programs need a way to compile and link more than
   one `ObjFunction` graph together, plus a decision about whether modules

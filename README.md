@@ -7,7 +7,7 @@ zero third-party dependencies.
 
 ```
 $ nyx
-nyx 0.1.0 -- Ctrl+D (or Ctrl+Z on Windows) to exit
+nyx 1.0.0 -- Ctrl+D (or Ctrl+Z on Windows) to exit
 > fun fib(n) { if (n < 2) { return n; } return fib(n - 1) + fib(n - 2); }
 > print(fib(20));
 6765
@@ -36,7 +36,7 @@ upvalue.
 | Closures (with shared upvalues) | `fun counter() { var n = 0; fun bump() { n = n + 1; return n; } return bump; }` |
 | Arrays | `var a = [1, 2, 3]; a[0] = 9; push(a, 4);` |
 | Maps (string-keyed) | `var m = {"a": 1}; m["b"] = 2; has(m, "a");` |
-| Native stdlib | `print`, `len`, `str`, `num`, `type`, `push`, `pop`, `keys`, `has`, `slice`, `assert`, `clock` |
+| Native stdlib | `print`, `len`, `str`, `num`, `type`, `push`, `pop`, `keys`, `has`, `slice`, `find`, `split`, `join`, `assert`, `clock` |
 
 See `examples/` for a couple of small complete programs, and
 `docs/grammar.ebnf` for the full grammar.
@@ -128,7 +128,7 @@ and, if Python 3 is available, a golden-file suite
 through the built interpreter and diffs its output against a checked-in
 `.expected` file.
 
-Current status on this machine: **531/531 unit checks pass, 5/5 golden
+Current status on this machine: **531/531 unit checks pass, 6/6 golden
 tests pass**, and the full suite plus every example script also passes
 clean under `-fsanitize=address,undefined` with `NYX_GC_STRESS` forcing a
 collection before every allocation.

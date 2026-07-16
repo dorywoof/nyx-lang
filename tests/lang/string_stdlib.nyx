@@ -1,0 +1,24 @@
+var csv = "privet,mir,zemlya";
+var parts = split(csv, ",");
+print(len(parts));
+print(parts[0]);
+print(parts[2]);
+print(join(parts, " | "));
+print(find(csv, "mir"));
+print(find(csv, "xyz"));
+print(find(csv, ""));
+
+var doubled = split("aXXbXXc", "XX");
+print(doubled[1]);
+print(join(doubled, "-"));
+
+var single = split("uno", ",");
+print(len(single));
+print(single[0]);
+
+var empty = [];
+print(join(empty, "-") == "");
+
+var trailing = split("a,b,", ",");
+print(len(trailing));
+print(trailing[2] == "");
