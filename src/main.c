@@ -31,7 +31,7 @@ static char *readFile(const char *path) {
 
 static void repl(void) {
     char line[4096];
-    printf("nyx %s -- Ctrl+D (or Ctrl+Z on Windows) to exit\n", "0.1.0");
+    printf("nyx %s -- Ctrl+D (or Ctrl+Z on Windows) to exit\n", "1.0.0");
     for (;;) {
         printf("> ");
         if (!fgets(line, sizeof(line), stdin)) {
