@@ -13,6 +13,4 @@ compile_commands.json
 *.a
 *.lib
 
-# local-only, not tracked
-docs/study-guide.md
 desktop.ini

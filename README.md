@@ -49,7 +49,9 @@ source --scan--> tokens --compile (single pass)--> bytecode --run--> output
 
 Full writeup, including every non-obvious design decision and why it was
 made: **[docs/architecture.md](docs/architecture.md)**. Bytecode
-instruction reference: **[docs/bytecode.md](docs/bytecode.md)**.
+instruction reference: **[docs/bytecode.md](docs/bytecode.md)**. A
+file-by-file tour of the source, and how to trace a program through it:
+**[docs/internals.md](docs/internals.md)**.
 
 ### Design decisions at a glance
 
