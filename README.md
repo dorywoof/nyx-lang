@@ -94,11 +94,19 @@ Requires a C99 compiler and CMake >= 3.16.
 
 ```sh
 cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+cmake --build build --config Release
 ./build/nyx path/to/script.nyx      # run a script
 ./build/nyx                         # REPL
 ./build/nyx --disasm path/to/script.nyx   # print compiled bytecode
 ```
+
+`--config Release` is not redundant. Multi-config generators (Visual
+Studio, Xcode) ignore `CMAKE_BUILD_TYPE` entirely, build `Debug` unless
+told otherwise, and put the result in a per-configuration subdirectory --
+so on Windows with the default generator the binary is
+`build\Release\nyx.exe`, not `build/nyx`. Single-config generators (Ninja,
+Make) accept the flag and ignore it, so the same commands work
+everywhere.
 
 Useful CMake options (`-D<option>=ON`):
 
@@ -119,9 +127,13 @@ zig cc -std=c99 -Wall -Wextra -Iinclude -O2 src/**/*.c src/main.c -lm -o nyx
 ## Testing
 
 ```sh
-cmake --build build --target nyx_unit_tests
-ctest --test-dir build --output-on-failure
+cmake --build build --config Release --target nyx_unit_tests
+ctest --test-dir build --output-on-failure -C Release
 ```
+
+`ctest` needs `-C` for the same reason: without it, a multi-config build
+tree cannot tell which configuration's binaries to run, and reports
+`Test not available without configuration` rather than running anything.
 
 This runs two suites: a custom C unit-test harness (`tests/test_*.c`) over
 the scanner, chunk/bytecode layer, hash table, and end-to-end VM behavior;
