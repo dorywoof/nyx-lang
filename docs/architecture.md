@@ -53,12 +53,12 @@ Two mainstream designs for a bytecode VM:
   from the top of an operand stack and pushes its result back. `1 + 2`
   compiles to `CONSTANT 1; CONSTANT 2; ADD` -- three instructions, no
   operand fields needed for where the values come from.
-- **Register-based** (what CPython's and Lua's VMs actually use): each
-  function has a bank of "registers" (really just stack slots addressed by
-  number), and instructions name their operands explicitly, e.g.
-  `ADD r2, r0, r1`. Fewer instructions execute per operation (no separate
-  push/pop), but each instruction is bigger and the compiler has to do
-  register allocation.
+- **Register-based** (what Lua has used since 5.0; CPython is stack-based
+  like Nyx): each function has a bank of "registers" (really just stack
+  slots addressed by number), and instructions name their operands
+  explicitly, e.g. `ADD r2, r0, r1`. Fewer instructions execute per
+  operation (no separate push/pop), but each instruction is bigger and the
+  compiler has to do register allocation.
 
 Nyx is stack-based because the compiler is dramatically simpler to write
 correctly -- there's no register allocator, no register-pressure

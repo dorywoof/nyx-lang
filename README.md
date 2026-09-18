@@ -56,7 +56,7 @@ file-by-file tour of the source, and how to trace a program through it:
 ### Design decisions at a glance
 
 - **Stack-based VM, not register-based.** Simpler compiler, some
-  performance left on the table versus what CPython/Lua do. ([more](docs/architecture.md#why-a-stack-based-vm-not-register-based))
+  performance left on the table versus a register machine like Lua's. ([more](docs/architecture.md#why-a-stack-based-vm-not-register-based))
 - **Mark-sweep GC, not reference counting.** Reference counting can't
   free cycles on its own; closures make cycles easy to create by accident.
   ([more](docs/architecture.md#why-mark-sweep-gc-not-reference-counting))
